@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-   
+    @State var posts:[Post] = []
     
     var body: some View {
         VStack {
@@ -17,8 +17,16 @@ struct ContentView: View {
             }
         }
         .padding()
+        
+        List(posts, id: \.userId){post in
+            VStack{
+                Text(post.title)
+                Text(post.body)
+            }
+        }.background(Color.gray)
+            .padding()
     }
-}
+
 func getPost(){
     let apiUrl = URL(string: "https://jsonplaceholder.typicode.com/posts")!
     
@@ -37,17 +45,21 @@ func getPost(){
         }
         
         do{
-            let posts = try JSONDecoder().decode([Post].self, from: jsonData)
-            for post in posts{
-                print("TITLE: \(post.title) BODY: \(post.body)")
+            let postdata = try JSONDecoder().decode([Post].self, from: jsonData)
+            
+            DispatchQueue.main.async{
+                self.posts = postdata
             }
+            /*for post in postdata{
+                print("TITLE: \(post.title) BODY: \(post.body)")
+            }*/
         }catch{
             print("Error decoding json")
         }
     }
     
     task.resume()
-}
+}}
 #Preview {
     ContentView()
 }
